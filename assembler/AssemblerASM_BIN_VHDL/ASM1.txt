@@ -1,0 +1,55 @@
+LDI $0    #Início do Setup
+STA @288    #Zerando hexas
+STA @289
+STA @290
+STA @291
+STA @292
+STA @293
+STA @256    #Zerando leds
+STA @257
+STA @258
+STA @0    #Armazenando 0 em unidade, dezena, centena, etc
+STA @1
+STA @2
+STA @3
+STA @4
+STA @5
+STA @6    #Constante de comparacao (0)
+STA @15   #Flag que para contagem
+STA @510
+STA @511
+STA @509
+LDI $1
+STA @7    #Constante de Incremento (1)
+LDI $10
+STA @8    #Constante de limite no display (10)
+LDI $0
+STA @9    #Limite de contagem em unidade, dezena, centena, etc
+STA @10  
+STA @11
+STA @12
+STA @13
+STA @14
+LDI $11
+STA @16   #Constante de limite de contagem (11)
+LDI $12
+STA @17   #Constante de limite de contagem (12)
+LDI $13
+STA @18   #Constante de limite de contagem (13)
+LDI $14
+STA @19   #Constante de limite de contagem (14)
+LDI $15 
+STA @20   #Constante de limite de contagem (15)
+LDI $0
+STA @21   #Constante de limite de contagem (0)
+LDI $9
+STA @22   #Constante de limite de contagem (9)
+INICIOTESTE:
+LDA @16 #11
+GT @20 #11>15
+JGT @ACENDE
+LDI $1
+STA @258
+ACENDE:
+LDI $1
+STA @257

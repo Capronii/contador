@@ -1,0 +1,204 @@
+LDI $0    #Início do Setup
+STA @288    #Zerando hexas
+STA @289
+STA @290
+STA @291
+STA @292
+STA @293
+STA @256    #Zerando leds
+STA @257
+STA @258
+STA @0    #Armazenando 0 em unidade, dezena, centena, etc
+STA @1
+STA @2
+STA @3
+STA @4
+STA @5
+STA @6    #Constante de comparacao (0)
+STA @15   #Flag que para contagem
+LDI $1
+STA @7    #Constante de Incremento (1)
+LDI $10
+STA @8    #Constante de limite no display (10)
+LDI $9    #Limite de contagem em unidade, dezena, centena, etc
+STA @9
+STA @10  
+STA @11
+STA @12
+STA @13
+STA @14
+STA @511
+INICIOLOOP: #Loop principal
+LDA @352 # Le o valor de KEY0
+CEQ @6   # Compara o valor de KEY0 com 0
+JEQ @PULAINCREMENTO # Se for igual a 0, nao icrementa e atualiza os displays
+JSR @INCREMENTA # Se for diferente de 0, entra na sub rotina de incremento
+PULAINCREMENTO: 
+JSR DISPLAYS # Atualiza os displays
+LDA @353 # Le o valor de KEY1
+CEQ @6 # Compara o valor de KEY1 com 0
+JEQ @LIMITE # Se for igual a 0, entra na subrotina de checagem de limite
+JSR @COFIGLIMITE # Se for diferente de 0, entra na sub rotina de configuracao de limite
+LIMITE:
+JSR @CHECALIMITE # Faz a checagem dos limites
+LDA @356 # Le o valor do FPGA_RESET
+CEQ @6 # Compara o valor do FPGA_RESET com 0
+JEQ @FIMLOOP # Se for igual a 0, vai para o fim do loop
+JSR @RESETAR # Se for diferente de 0, entra na sub rotina de reinicio de contagem
+FIMLOOP:  #Fim do Loop
+JMP @INICIOLOOP #Volta para o inicio do LOOP
+CONFIGLIMITE: #Rotina de configuracao de limite
+STA @510 #Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @9   #Armazena o valor das chaves no limite das unidades
+ESPERADEZENA:
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERADEZENA #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @10 #Armazena o valor das chaves no limte das dezenas
+ESPERACENTENA:
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERACENTENA #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @11 #Armazena o valor das chaves no limite das centenas
+ESPERAUNIDADEMILHAR:
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1
+JEQ @ESPERAUNIDADEMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @12 #Armazena o valor das chaves no limite das unidades de milhar
+ESPERADEZENAMILHAR:
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERADEZENAMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @13 #Armazena o valor das chaves no limite das dezenas de milhar
+ESPERACENTENAMILHAR:
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1
+JEQ @ESPERACENTENAMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+STA @14 #Armazena o valor das chaves no limite das centenas de milhar
+RET #Retorna para o LOOP principal
+CHECALIMITE:#Sub rotina de checagem de limite
+LDA @0 #Le o valor das unidades
+CEQ @9 # Compara com o valor limite das unidades
+JEQ @CHECADEZENA #Se for igual, checa se ocorre com as dezenas
+RET #Se for diferente, retorna para o LOOP principal
+CHECADEZENA:
+LDA @1 #Le o valor das dezenas
+CEQ @10 #Compara com o valor limite das dezenas
+JEQ @CHEGACENTENA #Se for igual, checa se ocorre com as centenas
+RET #Se for diferente, retorna para o LOOP principal
+CHECACENTENA:
+LDA @2 #Le o valor das centenas
+CEQ @11 #Compara com o valor limite das centenas
+JEQ @CHECAUNIDADEMILHAR #Se for igual, checa se ocorre com as unidades de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECAUNIDADEMILHAR:
+LDA @3 # Le o valor das unidades de milhar
+CEQ @12 # Compara com o valor limite das unidades de milhar 
+JEQ @CHECADEZENAMILHAR #Se for igual, checa se ocorre com as dezenas de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECADEZENAMILHAR:
+LDA @4 # Le o valor das dezenas de milhar
+CEQ @13 # Compara com o valor limite das dezenas de milhar 
+JEQ @CHECACENTENAMILHAR #Se for igual, checa se ocorre com as centenas de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECACENTENAMILHAR:
+LDA @5 # Le o valor das centenas de milhar
+CEQ @14 # Compara com o valor limite das centenas de milhar 
+JEQ @BATEUNOLIMITE #Se for igual, indica que o limite foi batido
+RET #Se for diferente, retorna para o LOOP principal
+BATEUNOLIMITE:
+LDI $1 #Atribui o valor 1 no acumulador
+STA @15 #Ativa a flag de parar contagem
+STA @257 #Ativa o LED de limite atingido 
+RET #Retorna pro LOOP principal
+DISPLAYS:
+LDA @0
+STA @288
+LDA @1
+STA @289
+LDA @2
+STA @290
+LDA @3
+STA @291
+LDA @4
+STA @292
+LDA @5
+STA @293
+RET
+INCREMENTA:
+STA @511
+LDA @15
+CEQ @6
+JEQ @UNIDADE
+RET
+UNIDADE:
+LDA @0
+SOMA @7     #Incrementa 1 na unidade
+CEQ @8      #Compara unidade com 10
+JEQ @UNIDADEPASSOU    
+STA @0
+RET
+UNIDADEPASSOU:
+LDA @1
+SOMA @7     #Incrementa 1 na dezena 
+CEQ @8      #Compara dezena com 10
+JEQ @DEZENAPASSOU
+STA @1
+RET
+DEZENAPASSOU:
+LDA @2
+SOMA @7     #Incrementa 1 na centena
+CEQ @8      #Compara centena com 10
+JEQ @CENTENAPASSOU
+STA @2
+RET
+CENTENAPASSOU:
+LDA @3
+SOMA @7 #Incrementa 1 na unidade de milhar
+CEQ @8  #Compara unidade de milhar com 10
+JEQ @UNIDADEMILHARPASSOU
+STA @3
+RET
+UNIDADEMILHARPASSOU:
+LDA @4
+SOMA @7 #Incrementa 1 na dezena de milhar
+CEQ @8  #Compara dezena de milhar com 10
+JEQ @DEZENAMILHARPASSOU
+STA @4
+RET
+DEZENAMILHARPASSOU:
+LDA @5
+SOMA @7 #Incrementa 1 na centena de milhar
+CEQ @8  #Compara centena de milhar com 10
+JEQ @CENTENAMILHARPASSOU
+STA @5
+RET
+CENTENAMILHARPASSOU:
+LDI $1
+STA @258
+STA @15 
+RET
+
+RESETAR:
+LDI $0
+STA @0
+STA @1
+STA @2
+STA @3
+STA @4
+STA @5
+STA @15
+STA @257
+STA @258
+RET 

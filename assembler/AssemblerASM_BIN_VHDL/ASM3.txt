@@ -1,0 +1,322 @@
+RESTART:
+LDI $0    #Início do Setup
+STA @288    #Zerando hexas
+STA @289
+STA @290
+STA @291
+STA @292
+STA @293
+STA @256    #Zerando leds
+STA @257
+STA @258
+STA @0    #Armazenando 0 em unidade, dezena, centena, etc
+STA @1
+STA @2
+STA @3
+STA @4
+STA @5
+STA @6    #Constante de comparacao (0)
+STA @15   #Flag que para contagem
+STA @510
+STA @511
+STA @509
+LDI $1
+STA @7    #Constante de Incremento (1)
+LDI $10
+STA @8    #Constante de limite no display (10)
+LDI $0
+STA @9    #Limite de contagem em unidade, dezena, centena, etc
+STA @10  
+STA @11
+STA @12
+STA @13
+STA @14
+LDI $9
+STA @16  #Constante de limite de valor
+INICIOLOOP: #Loop principal
+LDA @353 # Le o valor de KEY1
+CEQ @6 # Compara o valor de KEY1 com 0
+JEQ @INICIOLOOP # Se for igual a 0, fica no aguardo para quando for 1
+JSR @CONFIGLIMITE # Se for diferente de 0, entra na sub rotina de configuracao de Limite
+LDA @6 #Carrega 0 no acumulador
+STA @288 # Zera o HEX1
+STA @289 # Zera o HEX2
+STA @290 # Zera o HEX3
+STA @291 # Zera o HEX4
+STA @292 # Zera o HEX5
+STA @293 # Zera o HEX6
+STA @256 # Zera os LEDS(7~0)
+STA @258 # Zera os LED(9)
+STA @257 # Zera os LED(8) # Zera os displays depois de configurar os limites
+INCREMENTADOR: # Incrementa ate chegar no limite de contagem
+LDA @352 # Le o valor de KEY0
+CEQ @6   # Compara o valor de KEY0 com 0
+JEQ @PULA1 # Se for igual a 0, nao incrementa e atualiza os displays
+JSR @INCREMENTA # Se for diferente de 0, entra na sub rotina de incremento
+PULA1:
+JSR @ATUALIZA # Atualiza os displays
+JSR @CHECALIMITE # Checa pra ver se passou do limite setado
+LDA @15 # Le o valor da flag de inibir contagem
+CEQ @6 # Compara com 0 a flag (flag com valor 1 -> ativa, flag com valor 0 -> desativada)
+JEQ @INCREMENTADOR #Se a flag for 0, pode continuar incrementando
+JMP @TRAVA # Se for 1, trava a contagem
+CONFIGLIMITE: #Rotina de configuracao de limite
+LDI $1 # Carrega o valor 1
+STA @256 # Bota no endereco dos LEDS(7-0)
+STA @510 #Limpa a leitura de KEY1
+ESPERAUNIDADE:
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO #Se for maior que 9, atualiza os displays
+JMP @IGNORA
+VALORATUALIZADO:
+LDI $9
+IGNORA:
+STA @288 # Hex 0
+LDA @353 # Le KEY1
+CEQ @6 #Compara KEY1 com 0
+JEQ @ESPERAUNIDADE  #Se for 0, ou seja, nao esta apertado, espera ate apertar
+STA @510 #Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO2 #Se for maior que 9, atualiza os displays
+JMP @IGNORA2
+VALORATUALIZADO2:
+LDI $9
+IGNORA2:
+STA @9   #Armazena o valor das chaves no limite das unidades
+ESPERADEZENA:
+LDI $4 #Carrega o valor 4
+STA @256 # Bota o valor nos LEDS
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO3 #Se for maior que 9, atualiza os displays
+JMP @IGNORA3
+VALORATUALIZADO3:
+LDI $9
+IGNORA3:
+STA @289 # Hex 1
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERADEZENA #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO4 #Se for maior que 9, atualiza os displays
+JMP @IGNORA4
+VALORATUALIZADO4:
+LDI $9
+IGNORA4:
+STA @10 #Armazena o valor das chaves no limte das dezenas
+ESPERACENTENA:
+LDI $16 # Carrega o valor 16 no acumulador
+STA @256 # Bota o valor nos LEDS
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO5 #Se for maior que 9, atualiza os displays
+JMP @IGNORA5
+VALORATUALIZADO5:
+LDI $9
+IGNORA5:
+STA @290 # Hex 2
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERACENTENA #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO6 #Se for maior que 9, atualiza os displays
+JMP @IGNORA6
+VALORATUALIZADO6:
+LDI $9
+IGNORA6:
+STA @11 #Armazena o valor das chaves no limite das centenas
+ESPERAUNIDADEMILHAR:
+LDI $32 # Carrega o valor 32 no acumulador
+STA @256 # Bota o valor nos LEDS
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO7 #Se for maior que 9, atualiza os displays
+JMP @IGNORA7
+VALORATUALIZADO7:
+LDI $9
+IGNORA7:
+STA @291 # Hex 3
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1
+JEQ @ESPERAUNIDADEMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO8 #Se for maior que 9, atualiza os displays
+JMP @IGNORA8
+VALORATUALIZADO8:
+LDI $9
+IGNORA8:
+STA @12 #Armazena o valor das chaves no limite das unidades de milhar
+ESPERADEZENAMILHAR:
+LDI $128 # Carrega o valor 128 no acumulador
+STA @256 # Bota o valor nos LEDS
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO9 #Se for maior que 9, atualiza os displays
+JMP @IGNORA9
+VALORATUALIZADO9:
+LDI $9
+IGNORA9:
+STA @292 # Hex 4
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1 
+JEQ @ESPERADEZENAMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO10 #Se for maior que 9, atualiza os displays
+JMP @IGNORA10
+VALORATUALIZADO10:
+LDI $9
+IGNORA10:
+STA @13 #Armazena o valor das chaves no limite das dezenas de milhar
+ESPERACENTENAMILHAR:
+LDA @6 #Carrega 0 no acumulador
+STA @256 # Zera o valor nos LEDS(7~0)
+LDI $1 # Carrega o valor 1 no acumulador
+STA @257 # Bota o valor nos LEDS
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO11 #Se for maior que 9, atualiza os displays
+JMP @IGNORA11
+VALORATUALIZADO11:
+LDI $9
+IGNORA11:
+STA @293 # Hex 5
+LDA @353 #Le o valor de KEY1 novamente
+CEQ @6 #Compara com 0 o valor de KEY1
+JEQ @ESPERACENTENAMILHAR #Se for igual a 0, ficar em LOOP "esperando" o valor mudar
+STA @510 #Se for diferente de 0, Limpa a leitura de KEY1
+LDA @320 #Le o valor das chaves SW(7~0)
+GT @16 #Compara com 9
+JGT @VALORATUALIZADO12 #Se for maior que 9, atualiza os displays
+JMP @IGNORA12
+VALORATUALIZADO12:
+LDI $9
+IGNORA12:
+STA @14 #Armazena o valor das chaves no limite das centenas de milhar
+RET #Retorna para o LOOP principal
+INCREMENTA:
+STA @511 #Limpa a leitura de KEY1
+UNIDADE:
+LDA @0 #Carrega o valor da unidade no acumulador
+SOMA @7     #Incrementa 1 na unidade
+CEQ @8      #Compara unidade com 10
+JEQ @UNIDADEPASSOU  #Se for igual a 10, incrementa a dezena
+STA @0 #Se for diferente de 10, armazena o valor da unidade
+RET #Retorna para o LOOP principal
+UNIDADEPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @0 #Zera a unidade
+LDA @1 #Carrega o valor da dezena no acumulador
+SOMA @7     #Incrementa 1 na dezena 
+CEQ @8      #Compara dezena com 10
+JEQ @DEZENAPASSOU #Se for igual a 10, incrementa a centena
+STA @1 #Se for diferente de 10, armazena o valor da dezena
+RET #Retorna para o LOOP principal
+DEZENAPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @1 #Zera a dezena
+LDA @2 #Carrega o valor da centena no acumulador
+SOMA @7     #Incrementa 1 na centena
+CEQ @8      #Compara centena com 10
+JEQ @CENTENAPASSOU #Se for igual a 10, incrementa a unidade de milhar
+STA @2 #Se for diferente de 10, armazena o valor da centena
+RET #Retorna para o LOOP principal
+CENTENAPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @2 #Zera a centena
+LDA @3 #Carrega o valor da unidade de milhar no acumulador
+SOMA @7 #Incrementa 1 na unidade de milhar
+CEQ @8  #Compara unidade de milhar com 10
+JEQ @UNIDADEMILHARPASSOU #Se for igual a 10, incrementa a dezena de milhar
+STA @3 #Se for diferente de 10, armazena o valor da unidade de milhar
+RET #Retorna para o LOOP principal
+UNIDADEMILHARPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @3 #Zera a unidade de milhar
+LDA @4 #Carrega o valor da dezena de milhar no acumulador
+SOMA @7 #Incrementa 1 na dezena de milhar
+CEQ @8  #Compara dezena de milhar com 10
+JEQ @DEZENAMILHARPASSOU #Se for igual a 10, incrementa a centena de milhar
+STA @4 #Se for diferente de 10, armazena o valor da dezena de milhar
+RET #Retorna para o LOOP principal
+DEZENAMILHARPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @4 #Zera a dezena de milhar
+LDA @5 #Carrega o valor da centena de milhar no acumulador
+SOMA @7 #Incrementa 1 na centena de milhar
+CEQ @8  #Compara centena de milhar com 10
+JEQ @CENTENAMILHARPASSOU #Se for igual a 10, incrementa a unidade de milhao
+STA @5 #Se for diferente de 10, armazena o valor da centena de milhar
+RET #Retorna para o LOOP principal
+CENTENAMILHARPASSOU:
+LDA @6 #Carrega 0 no acumulador
+STA @5 #Zera a centena de milhar
+LDI $1 #Carrega 1 no acumulador
+STA @258 #Acende o LED(9)
+STA @15 #Ativa a flag de inibir incremento
+RET #Retorna para o LOOP principal
+ATUALIZA: #Atualiza os valores dos HEX
+LDA @0 #Le o valor das unidades
+STA @288 #Armazena o valor das unidades no HEX0
+LDA @1 #Le o valor das dezenas
+STA @289 #Armazena o valor das dezenas no HEX1
+LDA @2 #Le o valor das centenas
+STA @290 #Armazena o valor das centenas no HEX2
+LDA @3 #Le o valor das unidades de milhar
+STA @291 #Armazena o valor das unidades de milhar no HEX3
+LDA @4 #Le o valor das dezenas de milhar
+STA @292 #Armazena o valor das dezenas de milhar no HEX4
+LDA @5 #Le o valor das centenas de milhar
+STA @293 #Armazena o valor das centenas de milhar no HEX5
+RET #Retorna para o LOOP principal
+CHECALIMITE:
+LDA @0 #Le o valor das unidades
+CEQ @9 # Compara com o valor limite das unidades
+JEQ @CHECADEZENA #Se for igual, checa se ocorre com as dezenas
+RET #Se for diferente, retorna para o LOOP principal
+CHECADEZENA:
+LDA @1 #Le o valor das dezenas
+CEQ @10 #Compara com o valor limite das dezenas
+JEQ @CHECACENTENA #Se for igual, checa se ocorre com as centenas
+RET #Se for diferente, retorna para o LOOP principal
+CHECACENTENA:
+LDA @2 #Le o valor das centenas
+CEQ @11 #Compara com o valor limite das centenas
+JEQ @CHECAUNIDADEMILHAR #Se for igual, checa se ocorre com as unidades de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECAUNIDADEMILHAR:
+LDA @3 # Le o valor das unidades de milhar
+CEQ @12 # Compara com o valor limite das unidades de milhar 
+JEQ @CHECADEZENAMILHAR #Se for igual, checa se ocorre com as dezenas de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECADEZENAMILHAR:
+LDA @4 # Le o valor das dezenas de milhar
+CEQ @13 # Compara com o valor limite das dezenas de milhar 
+JEQ @CHECACENTENAMILHAR #Se for igual, checa se ocorre com as centenas de milhar
+RET #Se for diferente, retorna para o LOOP principal
+CHECACENTENAMILHAR:
+LDA @5 # Le o valor das centenas de milhar
+CEQ @14 # Compara com o valor limite das centenas de milhar 
+JEQ @BATEUNOLIMITE #Se for igual, indica que o limite foi batido
+RET #Se for diferente, retorna para o LOOP principal
+BATEUNOLIMITE:
+LDI $1 #Atribui o valor 1 no acumulador
+STA @15 #Ativa a flag de parar contagem
+STA @258 #Ativa o LED de limite atingido 
+RET #Retorna pro LOOP principal
+TRAVA: #Trava a contagem
+LDI $1
+STA @256
+LDA @356 #Le o valor do botao FPGA
+CEQ @6 #Compara com 0 o botao FPGA
+JEQ @TRAVA #Se for igual, continua travado
+JMP @RESTART #Se for diferente, reinicia a contagem

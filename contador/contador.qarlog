@@ -1,0 +1,36 @@
+Quartus Prime Archive log --	/home/jvpazotti/Desktop/Descomp/aulas/contador/contador.qarlog
+
+Archive:	/home/jvpazotti/Desktop/Descomp/aulas/contador/contador.qar
+Date:		Mon Apr 24 19:57:39 2023
+Quartus Prime		20.1.0 Build 711 06/05/2020 SJ Lite Edition
+
+	=========== Files Selected: ===========
+/home/jvpazotti/Desktop/Descomp/aulas/contador/CPU.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/ULASomaSub.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/buffer_3_state_8portas.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/contador.qpf
+/home/jvpazotti/Desktop/Descomp/aulas/contador/contador.qsf
+/home/jvpazotti/Desktop/Descomp/aulas/contador/contador.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/conversorHex7Seg.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/decoder3x8.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/decoderInstru.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/edgeDetector.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/flipflopGenerico.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/logicaDesvio.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/memoriaRAM.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/memoriaROM.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/muxGenerico2x1.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/muxGenerico4x1.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/registradorGenerico.vhd
+/home/jvpazotti/Desktop/Descomp/aulas/contador/somaConstante.vhd
+/home/jvpazotti/intelFPGA_lite/20.1/quartus/linux64/assignment_defaults.qdf
+	======= Total: 19 files to archive =======
+
+	================ Status: ===============
+All files archived successfully.
+
+
+******* Archived project restoration attempt on Tue Sep 26 14:08:26 2023
+Source archive file:	C:/Users/gcapr/OneDrive/Documentos/2023.1/Descomp/Descomp-main/Descomp-main/contador/contador.qar
+Archive was extracted into	C:/Users/gcapr/OneDrive/Documentos/2023.1/Descomp/Descomp-main/Descomp-main/contador/contador_restored/
+		 - successfully.
