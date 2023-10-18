@@ -4,7 +4,7 @@ use ieee.numeric_std.all;
 
 entity memoriaROM is
    generic (
-          dataWidth: natural := 13;
+          dataWidth: natural := 4;
           addrWidth: natural := 9
     );
    port (
@@ -14,7 +14,13 @@ entity memoriaROM is
 end entity;
 
 architecture assincrona of memoriaROM is
-  
+
+  type blocoMemoria is array(0 TO 2**addrWidth - 1) of std_logic_vector(dataWidth-1 DOWNTO 0);
+
+  function initMemory
+        return blocoMemoria is variable tmp : blocoMemoria := (others => (others => '0'));
+		  
+		  
   constant NOP  : std_logic_vector(3 downto 0) := "0000";
   constant LDA  : std_logic_vector(3 downto 0) := "0001";
   constant SOMA : std_logic_vector(3 downto 0) := "0010";
@@ -27,11 +33,8 @@ architecture assincrona of memoriaROM is
   constant JSR  : std_logic_vector(3 downto 0) := "1001";
   constant RET  : std_logic_vector(3 downto 0) := "1010";
 
-
-  type blocoMemoria is array(0 TO 2**addrWidth - 1) of std_logic_vector(dataWidth-1 DOWNTO 0);
-
-  function initMemory
-        return blocoMemoria is variable tmp : blocoMemoria := (others => (others => '0'));
+		  
+		  
   begin
       -- Palavra de Controle = SelMUX, Habilita_A, Reset_A, Operacao_ULA
       -- Inicializa os endereços:

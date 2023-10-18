@@ -4,7 +4,7 @@ JedecChain;
 	DefaultMfr(6E);
 
 	P ActionCode(Cfg)
-		Device PartName(5CEBA4F23) Path("/home/jvpazotti/Desktop/Descomp/aulas/contador/output_files/") File("contador.sof") MfrSpec(OpMask(1));
+		Device PartName(5CEBA4F23) Path("C:/Insper/6/DesComp/Projeto_Contador/Contador/output_files/") File("Contador.sof") MfrSpec(OpMask(1));
 
 ChainEnd;
 
